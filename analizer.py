@@ -67,7 +67,7 @@ def get_stat_files(stat_files_dir: str) -> list:
     return files
 
 
-def parse_stat_file(file_path: str, results=[]):
+def parse_stat_file(file_path: str):
     """
     Парсим excel файл
     :param file_name:
@@ -75,7 +75,8 @@ def parse_stat_file(file_path: str, results=[]):
     :return:
     """
     file = pd.read_excel(f'./{STAT_DIR}/{file_path}')
-    file.head()
+    result = file.to_dict()
+    print(result)
 
 
 if __name__ == "__main__":
