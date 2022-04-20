@@ -1,5 +1,6 @@
 """
-Есть N файлов excel в папке. В файлах лежит информация о планах работы и сотрудниках участвующих в проектах. Файлы внутри выглядят так:
+Есть N файлов excel в папке. В файлах лежит информация о планах работы и сотрудниках участвующих в проектах.
+Файлы внутри выглядят так:
 
 Название проекта	Руководитель	Дата сдачи план.	Дата сдачи факт.	Иванов Р.А.
 план.	Иванов Р.А.
@@ -39,9 +40,9 @@ import os
 import datetime
 import pandas as pd
 
-
 STAT_DIR = "projects_stat"
 LOG_FILE = "log.txt"
+EMPLOYERS_RAITING = dict()
 
 
 def logger(message: str):
@@ -55,32 +56,39 @@ def logger(message: str):
         log.write(f"{datetime.datetime.now()} - {message} \n")
 
 
-def get_stat_files(stat_files_dir: str) -> list:
-    """
-    Функция возвращает список файлов в папке
-    :param stat_files_dir: имя папки в каталоге скрипта
-    :return:
-    """
+def get_stat_files(stat_tables_dir: str) -> list:
     logger("Начинаем поиск таблиц в папке")
-    files = os.listdir(path=stat_files_dir)
-    logger(f"Найдено {len(files)} файлов")
-    return files
+    tables = os.listdir(path=stat_tables_dir)
+    logger(f"Найдено {len(tables)} файлов")
+    return tables
 
 
-def parse_stat_file(file_path: str):
-    """
-    Парсим excel файл
-    :param file_name:
-    :param results:
-    :return:
-    """
-    file = pd.read_excel(f'./{STAT_DIR}/{file_path}')
+def stat_file(file_name: str):
+    file_path = f'./{STAT_DIR}/{file_name}'
+    file = pd.read_excel(file_path)
     result = file.to_dict()
     print(result)
+    for i in range(len(result["Название проекта"])):
+        print(result["Название проекта"][i])
 
+
+def unpack_stat_files(files_list: list):
+    for file in files_list:
+        stat_file(file)
+
+
+employ_template = {
+    "ФИО": {
+        "Завершил проектов": 0,
+        "Завершил проектов в срок": 0,
+        "Учавствовал в проектах": 0,
+        "Плановых дней в проекте": 0,
+        "Уложился в плановые": 0
+    }
+}
 
 if __name__ == "__main__":
     logger("Начали")
     stat_files = get_stat_files(STAT_DIR)
-    parse_stat_file(stat_files[0])
+    unpack_stat_files(stat_files)
     logger("Закончили работу \n")
