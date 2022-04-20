@@ -69,7 +69,29 @@ def stat_file(file_name: str):
     result = file.to_dict()
     print(result)
     for i in range(len(result["Название проекта"])):
-        print(result["Название проекта"][i])
+        for key, value in result.items():
+            print(key, value[i])
+            add_data_employer("Завершил проектов", result["Руководитель"][i], 1)
+            date_plane = result["Дата сдачи план."][i]
+            date_fact = result["Дата сдачи факт."][i]
+            if (date_plane - date_fact).days >= 0:
+                add_data_employer("Завершил проектов в срок", result["Руководитель"][i], 1)
+            if key.endswith(" план.") and not key.startswith("Дата "):
+                pass
+                #add_data_employer("Участвовал в проектах", key[:-6], 1)
+                #add_data_employer("Плановых дней в проекте", key[:-6], value[i])
+
+
+def add_data_employer(field, name, data):
+    if name not in employers:
+        employers.update({name: {
+            "Завершил проектов": 0,
+            "Завершил проектов в срок": 0,
+            "Участвовал в проектах": 0,
+            "Плановых дней в проекте": 0,
+            "Уложился в плановые": 0
+        }})
+    employers[name][field] += data
 
 
 def unpack_stat_files(files_list: list):
@@ -77,18 +99,12 @@ def unpack_stat_files(files_list: list):
         stat_file(file)
 
 
-employ_template = {
-    "ФИО": {
-        "Завершил проектов": 0,
-        "Завершил проектов в срок": 0,
-        "Учавствовал в проектах": 0,
-        "Плановых дней в проекте": 0,
-        "Уложился в плановые": 0
-    }
-}
+employers = {}
 
 if __name__ == "__main__":
     logger("Начали")
     stat_files = get_stat_files(STAT_DIR)
     unpack_stat_files(stat_files)
+    for key, value in employers.items():
+        print(key, value)
     logger("Закончили работу \n")
